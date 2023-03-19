@@ -98,12 +98,14 @@ impl<'a> TreeQuery<'a> for SeekOpWithPatch<'a> {
                 } else {
                     self.pos += child.len();
 
-                    let mut num_vis = child.index.visible_len(self.encoding);
+                    let num_vis = child.index.visible_len(self.encoding);
                     self.seen += num_vis;
 
                     let last_elemid = ops[child.last()].elemid_or_key();
                     if child.index.has_visible(&last_elemid) {
                         self.last_seen = Some(last_elemid);
+                    } else if self.last_seen.is_some() && Some(last_elemid) != self.last_seen {
+                        self.last_seen = None;
                     }
                     QueryResult::Next
                 }
